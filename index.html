@@ -41,7 +41,7 @@ const DOTS={rit:'#A0522D',tas:'#C98A0B',spa:'#3E7C6B',con:'#3A6EA5'};
 const LINES={rit:'커피는 당신의 하루를 켜는 의식이에요.',tas:'커피는 당신에게 매번 새로운 한 모금이에요.',spa:'커피는 당신이 머무는 자리를 만들어요.',con:'커피는 당신이 사람을 만나는 이유예요.'};
 const demo = new URLSearchParams(location.search).has('demo');
 let a = {}, step = 0;
-// 측정 설계: 참여자 절반(무작위)은 카드 보기 전, 절반은 카드 본 뒤 같은 문항 → 두 집단 차이 = 카드 효과
+// 측정 설계: 참여자 절반(무작위)은 첫 질문 직후(상황 질문 전), 절반은 카드 본 뒤 같은 문항 → 두 집단 차이 = 참여 흐름 전체의 효과
 const PRE = Math.random() < 0.5; a.arm = PRE ? 'pre' : 'post';
 // 30일 재방문: 익명 브라우저 토큰(개인정보 아님, 기기 바꾸면 빠짐)
 let tok=null; try{ tok=localStorage.getItem('whycup_tok'); if(!tok){ tok=Math.random().toString(36).slice(2); localStorage.setItem('whycup_tok',tok); localStorage.setItem('whycup_first',Date.now()); } }catch(e){}
@@ -51,7 +51,7 @@ function ask(){
   const q = Q[step];
   $(hdr(`${step+1} / 4`)+`<div class="prog"><i style="width:${(step+1)*25}%"></i></div><h1>${q.t}</h1><div class="sub">${q.s||'&nbsp;'}</div>`+
     q.o.map(([v,l])=>`<button class="opt" data-v="${v}">${typeof v==='string'&&DOTS[v]?`<span class="dot" style="background:${DOTS[v]}"></span>`:''}${l}</button>`).join(''));
-  document.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{ const v=b.dataset.v; a['q'+(step+1)] = step===3?Number(v):v; step++; step<4?ask():(PRE?meaning(null):result()); });
+  document.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{ const v=b.dataset.v; a['q'+(step+1)] = step===3?Number(v):v; step++; if(step===1&&PRE){ meaning(null); return; } step<4?ask():result(); });
 }
 function result(){
   const r = computeType(a);
@@ -60,7 +60,7 @@ function result(){
    `<div class="card" style="background:${r.color}"><div style="width:46px;height:46px;float:right">${TYPE_ICONS[r.type]||ICONS[r.lens]}</div><div class="k">나의 커피 이유 · ${r.lensName}</div><div class="t">${r.type}</div><div class="q">${LINES[r.lens]}</div></div>`+
    (demo?`<div class="stat"><div><b>6%</b><span>서울 참여자 중 이 유형<br>(8% 미만이면 ‘드문 유형’)</span></div><div><b>하노이</b><span>이 유형이<br>가장 많은 도시</span></div></div>`:
      `<div class="stat"><div><b>집계 전</b><span>도시별 비율은<br>정식 시즌에 표시돼요</span></div><div><b>—</b><span>이 유형이<br>가장 많은 도시</span></div></div>`)+
-   `<div class="stick"><i style="background:${r.color}"></i><span>현장 스테이션에서 <b>${r.lensName} 색 스티커</b>를 가져가고, <b>원두 한 알</b>을 ${r.lensName} 기둥에 넣어 주세요.</span></div>`+
+   `<div class="stick"><i style="background:${r.color}"></i><span>현장 스테이션에서 <b>${r.lensName} 색 스티커와 원두 한 알</b>을 받아, ${r.lensName} 기둥에 넣어 주세요.</span></div>`+
    `<button class="ghost" id="ask">친구에게 “너는 왜 마셔?” 보내기</button>`+
    `<button class="cta" id="next">카드 받고 마무리하기</button>`+(demo?`<div class="note">수치는 예시</div>`:''));
   document.getElementById('ask').onclick=()=>{ const u=location.origin+location.pathname+'?from='+encodeURIComponent(r.type); if(navigator.share) navigator.share({title:'WHY CUP',text:`나는 「${r.type}」. 너는 왜 마셔?`,url:u}); else navigator.clipboard&&navigator.clipboard.writeText(u); };
@@ -68,9 +68,9 @@ function result(){
 }
 function meaning(r){
   $(hdr('마지막 한 가지')+`<h1>나는 내가 커피를 마시는 이유를<br>한 문장으로 말할 수 있다</h1><div class="sub">1 = 전혀 아니다 · 5 = 매우 그렇다 (첫 질문 답과 함께 집계)</div><div class="scale">${[1,2,3,4,5].map(n=>`<button data-n="${n}">${n}</button>`).join('')}</div>
-   <div class="sub" style="margin-top:22px">사는 도시 (지도에 올라가요 · 선택)</div><select id="city"><option value="">선택 안 함</option><option>서울</option><option>부산</option><option>하노이</option><option>호치민</option><option>파리</option><option>기타</option></select>
+   <div class="sub" style="margin-top:22px">지금 사는 도시 (지도는 이것만 셉니다 · 선택)</div><select id="city"><option value="">선택 안 함</option><option>서울</option><option>부산</option><option>하노이</option><option>호치민</option><option>파리</option><option>기타</option></select>
    <div class="note">이름 · 연락처 · 위치 정보는 받지 않아요.</div>`);
-  document.querySelectorAll('.scale button').forEach(b=>b.onclick=()=>{ document.querySelectorAll('.scale button').forEach(x=>x.style.borderColor='#E5E8EB'); b.style.borderColor='#C0571F'; a.meaning=+b.dataset.n; setTimeout(()=>(r?done(r):result()),250); });
+  document.querySelectorAll('.scale button').forEach(b=>b.onclick=()=>{ document.querySelectorAll('.scale button').forEach(x=>x.style.borderColor='#E5E8EB'); b.style.borderColor='#C0571F'; a.meaning=+b.dataset.n; setTimeout(()=>(r?done(r):ask()),250); });
 }
 function done(r){ $(hdr('완료')+`<h1>그냥 마시는 커피는<br>없어요.</h1><div class="sub">당신의 「${r.type}」 이유가 지도에 올라갔어요.<br>다음 달 1일, 새 질문 하나가 열려요.</div><button class="ghost" onclick="location.reload()">처음부터 다시</button>`); }
 const from = new URLSearchParams(location.search).get('from');

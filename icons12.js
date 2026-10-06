@@ -3,7 +3,7 @@ const S = 'viewBox="0 0 48 48" fill="none" stroke="#fff" stroke-width="3" stroke
 const TYPE_ICONS = {
   '아침 스위치형': `<svg ${S}><path d="M10 32a14 14 0 0 1 28 0"/><path d="M6 38h36"/><path d="M24 8v6M11 13l4 4M37 13l-4 4"/></svg>`,
   '몰입 시동형': `<svg ${S}><circle cx="24" cy="24" r="16"/><circle cx="24" cy="24" r="8"/><circle cx="24" cy="24" r="1.5"/></svg>`,
-  '쉼표 수집가': `<svg ${S}><circle cx="24" cy="20" r="7"/><path d="M30 22c0 8-5 13-11 16"/></svg>`,
+  '쉼표 수집가': `<svg ${S}><circle cx="24" cy="24" r="16"/><path d="M19 17v14M29 17v14"/></svg>`,
   '원두 탐험가': `<svg ${S}><circle cx="24" cy="24" r="17"/><path d="M30 18l-4 10-8 4 4-10z"/></svg>`,
   '단골 맛 수호자': `<svg ${S}><path d="M24 7l14 5v11c0 9-6 15-14 18-8-3-14-9-14-18V12z"/><path d="M18 24l4 4 8-8"/></svg>`,
   '디저트 페어링러': `<svg ${S}><path d="M8 34l30-14v14z"/><path d="M8 34h30v6H8z"/><path d="M38 20c0-4-3-6-6-5"/></svg>`,
