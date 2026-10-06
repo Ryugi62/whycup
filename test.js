@@ -14,3 +14,7 @@ for (const k of ['rit','tas','spa','con']) for (const s of [0,1,2]) seen.add(com
 assert.strictEqual(seen.size, 12);
 assert.strictEqual(computeType({ q1: 'spa', q2: 'tas', q3: 'spa', q4: 1 }).lens, 'spa');
 console.log('OK 7 assertions — 12 types reachable');
+// 12유형 아이콘이 유형 이름과 1:1
+const { TYPE_ICONS } = require('./icons12.js');
+for (const l of Object.values(LENSES)) for (const t of l.types) assert.ok(TYPE_ICONS[t], 'icon ' + t);
+console.log('OK icons 12/12');
