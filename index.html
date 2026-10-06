@@ -55,7 +55,7 @@ function result(){
    `<div class="card" style="background:${r.color}"><div style="width:46px;height:46px;float:right">${ICONS[r.lens]}</div><div class="k">나의 커피 이유 · ${r.lensName}</div><div class="t">${r.type}</div><div class="q">${LINES[r.lens]}</div></div>`+
    (demo?`<div class="stat"><div><b>6%</b><span>서울 참여자 중 이 유형<br>(8% 미만이면 ‘드문 유형’)</span></div><div><b>하노이</b><span>이 유형이<br>가장 많은 도시</span></div></div>`:
      `<div class="stat"><div><b>—</b><span>도시별 비율은<br>집계 서버 연결 후</span></div><div><b>—</b><span>이 유형이<br>가장 많은 도시</span></div></div>`)+
-   `<div class="stick"><i style="background:${r.color}"></i><span>현장에서는 <b>${r.lensName} 색 스티커</b>를 컵에 붙이고, 다 마신 컵은 <b>${r.lensName} 기둥</b>에 넣어 주세요.</span></div>`+
+   `<div class="stick"><i style="background:${r.color}"></i><span>현장 스테이션에서 <b>${r.lensName} 색 스티커</b>를 가져가고, <b>원두 한 알</b>을 ${r.lensName} 기둥에 넣어 주세요.</span></div>`+
    `<button class="ghost" id="ask">친구에게 “너는 왜 마셔?” 보내기</button>`+
    `<button class="cta" id="next">카드 받고 마무리하기</button>`+(demo?`<div class="note">수치는 예시</div>`:''));
   document.getElementById('ask').onclick=()=>{ const u=location.origin+location.pathname+'?from='+encodeURIComponent(r.type); if(navigator.share) navigator.share({title:'WHY CUP',text:`나는 「${r.type}」. 너는 왜 마셔?`,url:u}); else navigator.clipboard&&navigator.clipboard.writeText(u); };

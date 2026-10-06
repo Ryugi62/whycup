@@ -12,4 +12,5 @@ assert.strictEqual(computeType({ q1: 'just', q2: 'rit', q3: 'rit', q4: 0 }).wasJ
 const seen = new Set();
 for (const k of ['rit','tas','spa','con']) for (const s of [0,1,2]) seen.add(computeType({ q1: 'just', q2: k, q3: k, q4: s }).type);
 assert.strictEqual(seen.size, 12);
-console.log('OK 6 assertions — 12 types reachable');
+assert.strictEqual(computeType({ q1: 'spa', q2: 'tas', q3: 'spa', q4: 1 }).lens, 'spa');
+console.log('OK 7 assertions — 12 types reachable');
