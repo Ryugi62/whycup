@@ -1,0 +1,74 @@
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>WHY CUP — 그냥 마시는 커피는 없다</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;background:#fff;color:#191F28;-webkit-font-smoothing:antialiased}
+.app{max-width:420px;margin:0 auto;min-height:100vh;position:relative;padding:0 22px 110px}
+.top{height:48px;display:flex;align-items:center;justify-content:space-between;font-size:13px;color:#6B7684}
+.brand{font-weight:800;color:#C0571F;letter-spacing:.5px}
+.prog{height:4px;background:#F2F4F6;border-radius:2px;overflow:hidden;margin-bottom:22px}.prog i{display:block;height:100%;background:#C0571F;transition:width .2s}
+h1{font-size:25px;line-height:1.32;font-weight:800;margin:6px 0 8px}
+.sub{font-size:14px;color:#6B7684;margin-bottom:20px;line-height:1.5}
+.opt{display:flex;align-items:center;gap:12px;width:100%;border:1.5px solid #E5E8EB;border-radius:14px;padding:15px 16px;font-size:16px;margin-bottom:10px;background:#fff;text-align:left;color:#191F28;cursor:pointer;font-family:inherit}
+.opt:active,.opt.on{border-color:#C0571F;background:#FBF3EE}
+.dot{width:12px;height:12px;border-radius:6px;flex:none}
+.card{border-radius:22px;color:#fff;padding:24px 22px;margin-top:4px}
+.card .k{font-size:13px;opacity:.88}.card .t{font-size:30px;font-weight:800;line-height:1.25;margin:10px 0 12px}
+.card .q{font-size:15px;line-height:1.55;border-top:1px solid rgba(255,255,255,.35);padding-top:12px}
+.reveal{font-size:15px;font-weight:700;color:#C0571F;margin:16px 0 6px}
+.stat{display:flex;gap:10px;margin-top:12px}.stat div{flex:1;background:#F4F6F8;border-radius:16px;padding:14px}
+.stat b{font-size:22px;display:block}.stat span{font-size:12px;color:#6B7684}
+.stick{display:flex;gap:12px;align-items:center;background:#F4F6F8;border-radius:16px;padding:14px;margin-top:12px;font-size:14px;line-height:1.45}
+.stick i{width:34px;height:34px;border-radius:17px;flex:none}
+.cta{position:fixed;left:50%;transform:translateX(-50%);bottom:18px;width:calc(min(420px,100vw) - 44px);height:54px;border-radius:14px;background:#C0571F;color:#fff;font-weight:700;font-size:16px;border:0;font-family:inherit}
+.ghost{width:100%;height:50px;border-radius:14px;background:#F4F6F8;color:#191F28;font-weight:700;font-size:15px;border:0;margin-top:12px;font-family:inherit}
+.scale{display:flex;gap:8px}.scale button{flex:1;height:52px;border-radius:12px;border:1.5px solid #E5E8EB;background:#fff;font-size:17px;font-weight:700;font-family:inherit}
+.note{font-size:11px;color:#8B95A1;text-align:center;margin-top:14px}
+select{width:100%;height:50px;border-radius:12px;border:1.5px solid #E5E8EB;padding:0 12px;font-size:15px;font-family:inherit;background:#fff;margin-top:8px}
+.hide{display:none}
+</style></head><body><div class="app" id="app"></div>
+<script src="type.js"></script>
+<script src="icons.js"></script>
+<script>
+const Q = [
+ { t:'솔직히, 오늘 커피<br>왜 마셨어요?', s:'정답은 없어요. 제일 가까운 걸 고르세요.', o:[['just','그냥요, 습관이에요'],['rit','잠 깨려고요'],['tas','맛있어서요'],['spa','머물 자리가 필요해서요'],['con','누구랑 같이 마셨어요']] },
+ { t:'커피 없는 아침을<br>상상하면?', s:'', o:[['rit','하루가 시작이 안 돼요'],['tas','입이 너무 심심해요'],['spa','갈 곳이 없어져요'],['con','사람 만날 핑계가 사라져요']] },
+ { t:'가장 좋아하는<br>커피 순간은?', s:'', o:[['rit','첫 모금 뒤 머리가 켜질 때'],['tas','처음 보는 원두를 맛볼 때'],['spa','좋아하는 자리에 앉았을 때'],['con','같이 마시며 수다 떨 때']] },
+ { t:'커피 한 잔에<br>쓰는 시간은?', s:'', o:[[0,'5분 안에 후다닥'],[1,'천천히 15분쯤'],[2,'한 시간도 넘게']] },
+];
+const DOTS={rit:'#A0522D',tas:'#C98A0B',spa:'#3E7C6B',con:'#3A6EA5'};
+const LINES={rit:'커피는 당신의 하루를 켜는 의식이에요.',tas:'커피는 당신에게 매번 새로운 한 모금이에요.',spa:'커피는 당신이 머무는 자리를 만들어요.',con:'커피는 당신이 사람을 만나는 이유예요.'};
+const demo = new URLSearchParams(location.search).has('demo');
+let a = {}, step = 0;
+const $ = h => { document.getElementById('app').innerHTML = h; };
+function hdr(r){ return `<div class="top"><span class="brand">WHY CUP</span><span>${r}</span></div>`; }
+function ask(){
+  const q = Q[step];
+  $(hdr(`${step+1} / 4`)+`<div class="prog"><i style="width:${(step+1)*25}%"></i></div><h1>${q.t}</h1><div class="sub">${q.s||'&nbsp;'}</div>`+
+    q.o.map(([v,l])=>`<button class="opt" data-v="${v}">${typeof v==='string'&&DOTS[v]?`<span class="dot" style="background:${DOTS[v]}"></span>`:''}${l}</button>`).join(''));
+  document.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{ const v=b.dataset.v; a['q'+(step+1)] = step===3?Number(v):v; step++; step<4?ask():result(); });
+}
+function result(){
+  const r = computeType(a);
+  $(hdr('나의 커피 이유')+
+   (r.wasJust?`<div class="reveal">‘그냥’이 아니었어요.</div>`:`<div class="reveal">당신의 이유를 찾았어요.</div>`)+
+   `<div class="card" style="background:${r.color}"><div style="width:46px;height:46px;float:right">${ICONS[r.lens]}</div><div class="k">나의 커피 이유 · ${r.lensName}</div><div class="t">${r.type}</div><div class="q">${LINES[r.lens]}</div></div>`+
+   (demo?`<div class="stat"><div><b>6%</b><span>서울 참여자 중 이 유형<br>(8% 미만이면 ‘드문 유형’)</span></div><div><b>하노이</b><span>이 유형이<br>가장 많은 도시</span></div></div>`:
+     `<div class="stat"><div><b>—</b><span>도시별 비율은<br>집계 서버 연결 후</span></div><div><b>—</b><span>이 유형이<br>가장 많은 도시</span></div></div>`)+
+   `<div class="stick"><i style="background:${r.color}"></i><span>현장에서는 <b>${r.lensName} 색 스티커</b>를 컵에 붙이고, 다 마신 컵은 <b>${r.lensName} 기둥</b>에 넣어 주세요.</span></div>`+
+   `<button class="ghost" id="ask">친구에게 “너는 왜 마셔?” 보내기</button>`+
+   `<button class="cta" id="next">카드 받고 마무리하기</button>`+(demo?`<div class="note">수치는 예시</div>`:''));
+  document.getElementById('ask').onclick=()=>{ const u=location.origin+location.pathname+'?from='+encodeURIComponent(r.type); if(navigator.share) navigator.share({title:'WHY CUP',text:`나는 「${r.type}」. 너는 왜 마셔?`,url:u}); else navigator.clipboard&&navigator.clipboard.writeText(u); };
+  document.getElementById('next').onclick=()=>meaning(r);
+}
+function meaning(r){
+  $(hdr('마지막 한 가지')+`<h1>나는 내가 커피를 마시는 이유를<br>한 문장으로 말할 수 있다</h1><div class="sub">1 = 전혀 아니다 · 5 = 매우 그렇다 (첫 질문 답과 함께 집계)</div><div class="scale">${[1,2,3,4,5].map(n=>`<button data-n="${n}">${n}</button>`).join('')}</div>
+   <div class="sub" style="margin-top:22px">사는 도시 (지도에 올라가요 · 선택)</div><select id="city"><option value="">선택 안 함</option><option>서울</option><option>부산</option><option>하노이</option><option>호치민</option><option>파리</option><option>기타</option></select>
+   <div class="note">이름 · 연락처 · 위치 정보는 받지 않아요.</div>`);
+  document.querySelectorAll('.scale button').forEach(b=>b.onclick=()=>{ document.querySelectorAll('.scale button').forEach(x=>x.style.borderColor='#E5E8EB'); b.style.borderColor='#C0571F'; a.meaning=+b.dataset.n; setTimeout(()=>done(r),250); });
+}
+function done(r){ $(hdr('완료')+`<h1>그냥 마시는 커피는<br>없어요.</h1><div class="sub">당신의 「${r.type}」 이유가 지도에 올라갔어요.</div><button class="ghost" onclick="location.reload()">처음부터 다시</button>`); }
+const from = new URLSearchParams(location.search).get('from');
+$(hdr('Why We Drink')+`<h1>${from?`친구는 「${from}」래요.<br>당신은 왜 마셔요?`:'그냥 마시는 커피는<br>없다.'}</h1><div class="sub">질문 4개면 당신의 커피 이유를 찾아 드려요.<br>로그인 · 회원가입 없음.</div><button class="cta" id="go">시작하기</button><div style="display:flex;gap:10px;margin-top:28px">${['rit','tas','spa','con'].map(k=>`<div style="width:58px;height:58px;border-radius:29px;background:${DOTS[k]};padding:12px">${ICONS[k]}</div>`).join('')}</div>`);
+document.getElementById('go').onclick=()=>ask();
+</script></body></html>
